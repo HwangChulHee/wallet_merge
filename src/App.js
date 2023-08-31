@@ -1,3 +1,4 @@
+/*global chrome*/
 import React, { useState, useEffect } from 'react';
 import {
   goBack,
@@ -13,6 +14,8 @@ import { BrowserRouter, Route,Routes} from 'react-router-dom';
 import Welcome from './pages/welcome';
 import Header from './pages/header';
 import Test from './pages/test'
+
+import PopupComponent from './popup/PopupComponent'
 
 
 const Three = ({message}) => (
@@ -45,22 +48,48 @@ const One = () => {
 
 
 function App() {
+
+  const [request, setRequest] = useState('');
+  const [componentsToRender, setComponentsToRender] = useState([]);
+
+  // // 로컬 저장소로부터 상태를 받아온다.
+  useEffect(() => {
+    
+    chrome.storage.local.get(['request_state'], (result) => {
+      const storedData = result.request_state; 
+      setRequest(storedData);
+      
+      console.log(storedData)
+
+      if(storedData == "init") {
+        let updateData = [];
+        updateData.push(<Header />); 
+        updateData.push(<Router><Welcome /></Router>);
+        setComponentsToRender(updateData);
+
+      } else if(storedData == "dapp_login") {
+        let updateData = [];
+        updateData.push(<PopupComponent/>);
+        setComponentsToRender(updateData);
+      }
+      
+      
+    });
+
+  }, []);
+
+  
   
   return (
     <>
-      <Header />
+      {
+        componentsToRender
+      }      
 
-      <BrowserRouter>
-        <Routes>
-          <Route path='/test' element = {<Test />}/>
-        </Routes>      
-      </BrowserRouter>
-      
+      {/* <Header/>
       <Router>
-        <Welcome />
-      </Router>
-
-      
+        <Welcome/>
+      </Router> */}
     </>
   );
 }

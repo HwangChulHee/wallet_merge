@@ -13,6 +13,7 @@ import '../../css/card.css'
 import {Button, Card, Form, InputGroup} from 'react-bootstrap';
 import Completion from '../completion';
 import React, { useState, useEffect } from 'react';
+import Make_account from './make-account';
 
 
 function getRandomIndices(array, count) {
@@ -202,6 +203,7 @@ export default function Confirm_recovery_phrase(message) {
             </div>
                   
             <Button onClick={handleInitMnemonic} disabled={!isCorrect} className="mb-2 btn_primary card-content">확인</Button>     
+            {/* <Button onClick={()=>goTo(Completion)} className="mb-2 btn_primary card-content">테스트</Button>      */}
           </Card.Body>
         </Card>
       </div>

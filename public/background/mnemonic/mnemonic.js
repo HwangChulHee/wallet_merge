@@ -56,6 +56,17 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
  
          return true; // 비동기 통신과 연관이 있다.
 
+    } else if(message.action === "account_store") {
+
+        // 추후 배열로 바꿀 것.
+
+        const obj = {account_name : message.account_name, publicKey : message.publicKey, privateKey : message.privateKey }
+        
+        chrome.storage.local.set({accounts : obj}).then(() => {
+            console.log("account 저장..")
+        })
+
+        return true; // 비동기 통신과 연관이 있다.        
     }
  
 });

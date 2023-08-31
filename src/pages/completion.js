@@ -12,6 +12,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 import '../css/card.css'
 import {Button, Card, Form} from 'react-bootstrap';
 import Welcome from './welcome';
+import Make_account from './wallet_create/make-account';
 
 export default function Completion() {
 
@@ -34,7 +35,7 @@ export default function Completion() {
                     </div>
                    
 
-                    <Button onClick={() => goTo(Welcome)} className="mb-2 btn_primary card-content">확인했습니다</Button>
+                    <Button onClick={() => goTo(Make_account)} className="mb-2 btn_primary card-content">확인했습니다</Button>
                 </Card.Body>
             </Card>
         </div>

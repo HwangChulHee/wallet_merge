@@ -17,6 +17,17 @@
       "matches": [
       "http://221.148.25.234/hch_test/*"
       ]
+  }, 
+  {
+    "js": ["scripts/content_login.js"],
+      "matches": [
+      "http://cryptoexplorer.store/"
+      ]
   }
-] 
+],
+"sandbox": {
+  "pages": [
+    "popup/popup.html"
+  ]
+} 
 }

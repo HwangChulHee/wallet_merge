@@ -1,15 +1,11 @@
-console.log("콘텐츠 스크립트 실행")
+console.log("크립토 익스플로러~")
 
-/* 
-    컨텐츠 스크립트를 통해 동적 생성 하는 예제 
-*/
-
-// container의 id 값 가져옴
 const btn_login = document.getElementById("login");
 
 
 //서비스 워커에게 데이터 요청.. 디앱 로그인을 위한 index.html을 띄어주기만 한다.
 btn_login.addEventListener("click", function(event) {
+    console.log("클릭 이벤트 발생")
     chrome.runtime.sendMessage(
         { action: "dapp_login"}, 
         (respoonse) => {
@@ -17,8 +13,6 @@ btn_login.addEventListener("click", function(event) {
             console.log(respoonse)
     });
 })
-
-
 
 
 chrome.runtime.onMessage.addListener(
