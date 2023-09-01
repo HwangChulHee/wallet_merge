@@ -1,4 +1,4 @@
-console.log("크립토 익스플로러~")
+console.log("지갑으로 스크립트 주입 : 크립토 익스플로러 - 로그인 ~ (content_login.js)")
 
 const btn_login = document.getElementById("login");
 
@@ -17,10 +17,7 @@ btn_login.addEventListener("click", function(event) {
 
 chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse) {
-      console.log(sender.tab ?
-                  "from a content script:" + sender.tab.url :
-                  "from the extension");
-
+      
       if (request.action === "login_complete_from_extension") {
         
         console.log("여기다 로직을 작성하면됨!")

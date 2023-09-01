@@ -16,6 +16,7 @@ import Header from './pages/header';
 import Test from './pages/test'
 
 import PopupComponent from './popup/PopupComponent'
+import Sign_request_transaction from './popup/Sign_request_transaction';
 
 
 const Three = ({message}) => (
@@ -71,8 +72,12 @@ function App() {
         let updateData = [];
         updateData.push(<PopupComponent/>);
         setComponentsToRender(updateData);
+
+      } else if(storedData == "dapp_trx") {
+        let updateData = [];
+        updateData.push(<Sign_request_transaction/>);
+        setComponentsToRender(updateData);
       }
-      
       
     });
 

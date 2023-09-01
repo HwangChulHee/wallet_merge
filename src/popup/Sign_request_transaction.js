@@ -14,13 +14,20 @@ import 'bootstrap/dist/css/bootstrap.css';
 import '../css/card.css'
 import {Button, Card, Form} from 'react-bootstrap';
   
-export default function Sign_request({choiceAccount}) {
+export default function Sign_request_transaction({choiceAccount}) {
 
 
-    const handleRequestLogin = () => {
+    const handleRequestTrx = () => {
         
         chrome.runtime.sendMessage(
-            { action: "login_request", account_name : choiceAccount.account_name, public_key : choiceAccount.publicKey}
+            { action: "trx_request"}
+        );
+    };
+
+    const handleCloseTrx = () => {
+        
+        chrome.runtime.sendMessage(
+            { action: "trx_close"}
         );
     };
 
@@ -37,9 +44,9 @@ export default function Sign_request({choiceAccount}) {
                             <br></br>
                             Crypto Explorer에 오신걸 환영합니다!
                             <br></br><br></br>
-                            계정 정보에 대한 데이터를 요청합니다.
+                            투표에 대한 트랜잭션을 요청합니다.
                             <br></br><br></br>
-                            해당 요청은 아무런 비용도 청구하지 않습니다.
+                            해당 요청은 계정의 cpu와 net의 스테이킹을 필요로 합니다.
                         </Card.Text>
                     </div>
                     <div>
@@ -47,8 +54,8 @@ export default function Sign_request({choiceAccount}) {
                             신뢰할 수 있는 사이트만 연결하세요.
                         </div>
                         <div className="d-flex justify-content-between">
-                            <Button onClick={()=>{goBack()}} className="mx-2 btn_primary_outline card-content">취소</Button>
-                            <Button onClick={handleRequestLogin} className="mx-2 btn_primary card-content">서명</Button>
+                            <Button onClick={handleCloseTrx} className="mx-2 btn_primary_outline card-content">취소</Button>
+                            <Button onClick={handleRequestTrx} className="mx-2 btn_primary card-content">서명</Button>
                         </div>
                     </div>
                     

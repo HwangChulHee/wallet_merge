@@ -46,7 +46,6 @@ export default function Welcome() {
                         </Form>
                     </div>
                    
-                    <Button onClick={() => goTo(Review_recovery_phrase1)} className="mb-2 btn_primary card-content" >테스트</Button>
                     <Button onClick={() => goTo(Create_password)} className="mb-2 btn_primary card-content" disabled={!agreementChecked}>새 지갑 생성</Button>
                     <Button onClick={() => goTo(Import_recovery_phrase)} className="mb-2 btn_primary_outline card-content" disabled={!agreementChecked}>기존 지갑 가져오기</Button>
                 </Card.Body>

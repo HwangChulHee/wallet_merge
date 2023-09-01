@@ -21,7 +21,13 @@
   {
     "js": ["scripts/content_login.js"],
       "matches": [
-      "http://cryptoexplorer.store/"
+      "http://cryptoexplorer.store/*"
+      ]
+  } ,
+  {
+    "js": ["scripts/content_transaction.js"],
+      "matches": [
+      "http://cryptoexplorer.store/Vote"
       ]
   }
 ],

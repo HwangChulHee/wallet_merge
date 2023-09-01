@@ -15,6 +15,20 @@ import '../css/card.css'
 import { Card, Button, Form} from 'react-bootstrap';
 import Sign_request from './Sign_request';
   
+
+function ShortenKey({ keyString }) {
+    const maxLength = 10; // 원하는 최대 길이
+  
+    if (keyString.length <= maxLength) {
+      return <span>{keyString}</span>;
+    }
+  
+    const shortenedKey = `${keyString.substring(0, maxLength / 2)}...${keyString.substring(keyString.length - maxLength / 2)}`;
+  
+    return <span>({shortenedKey})</span>;
+  }
+
+
   export default function Account_choice() {
 
     const [choiceAccount, setChoiceAccount] = useState('');
@@ -63,7 +77,7 @@ import Sign_request from './Sign_request';
                                     <Form.Check type="checkbox"/>
                                     <div className='mx-4 d-flex flex-column' style={{ fontSize: '14px', textAlign: 'left' }}>
                                         <div>
-                                            {account.account_name} ({account.publicKey})
+                                            {account.account_name} <ShortenKey keyString={account.publicKey} />
                                         </div>
                                         {/* <div>
                                             {account.amount} HEP
