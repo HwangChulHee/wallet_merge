@@ -17,9 +17,9 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
         // 디앱 트랜잭션 요청 시
 
         auth_name = message.auth_name;
-        data = message.data;
+        data = JSON.parse(message.data);
         action_account = message.action_account;
-        action_name = JSON.parse(message.action_name); // 정보 저장
+        action_name = message.action_name; // 정보 저장
 
         // request_state 저장. 이 정보를 통해 index.html이 팝업창에 어떤 ui를 띄어줄지 결정한다.        
         chrome.storage.local.set({request_state : "dapp_trx"}).then(() => {

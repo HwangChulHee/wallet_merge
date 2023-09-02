@@ -36,7 +36,9 @@ if(btn_transaction != null) {
         const statusInput = document.getElementById('status');
 
         if (buttonElement) {
-          resultInput.value = request.result;
+          console.log(request.result)
+          console.log(request.status)
+          resultInput.value = JSON.stringify(request.result);
           statusInput.value = request.status;
           buttonElement.click(); // 이벤트 트리거 시켜주기
 
