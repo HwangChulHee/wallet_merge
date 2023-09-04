@@ -27,32 +27,15 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
         /*
             2. 니모닉과 초기 숫자(0)를 api 서버에 요청해서, 키 값을 받아온다.
         */
-         const apiUrl = "http://221.148.25.234:3100/key_create_from_mnemonic"; // 니모닉으로부터 키 생성하는 api
-
-         // fetch 함수를 사용하여 API 요청 보내기
-         fetch(apiUrl, {
-             method: "POST",
-             headers: {
-                 "Content-Type": "application/json"
-             },
-             body: JSON.stringify({
-                mnemonic: message.mnemonic,
-                num_child: 0,
-              })
-         })
-             .then(response => {
-                 // 응답을 JSON으로 파싱
-                 return response.json();
-             })
-             .then(data => {
-                 // API 응답 데이터 처리
-                 console.log("키 생성 API 응답 데이터:", data);
-                 key_store(data)
-             })
-             .catch(error => {
-                 // 에러 처리
-                 console.error("키 생성 API 요청 중 에러:", error);
-             });
+        const url = "http://221.148.25.234:3100/key_create_from_mnemonic";
+        const data = {
+            mnemonic: message.mnemonic,
+            num_child: 0,
+          };
+        
+        postJSON(url, data).then((data) => {
+            key_store(data)
+        });
  
          return true; // 비동기 통신과 연관이 있다.
 
@@ -82,7 +65,7 @@ async function key_store(data) {
     if(result.keys) {
         //keys라는 key의 데이터가 존재하지 않거나 해당 값의 값들이 배열이 아닐때.. 즉, 초기값일 때를 의미함.
         try {
-            const keysArray = JSON.parse(result.keys);
+            const keysArray = result.keys;
             if (Array.isArray(keysArray)) {
               updateData = keysArray;
               console.log("updateData에 과거 데이터 추가.")
@@ -98,13 +81,31 @@ async function key_store(data) {
     const keyPairs = data.keyPairs[0]; // 매개변수 데이터로부터 key값이 keyParirs의 첫번째 원소들을 가져오고
     updateData.push(keyPairs); // 기존 데이터를 추가해준다.
 
-    const keyJsonData = JSON.stringify(updateData); // 해당 데이터를 json화 시켜준다.
-    console.log("update된 json 데이터",keyJsonData);
-
-
+    
     // 3. 해당 배열을 chrome.storage에 다시 넣어준다. (갱신한다)
-    await chrome.storage.local.set({keys : keyJsonData}); // 테스트를 위해 await 함
+    await chrome.storage.local.set({keys : updateData}); // 테스트를 위해 await 함
     const result2 = await chrome.storage.local.get(["keys"]);
     console.log("갱신된 key 값들",result2);
     
 }
+
+
+async function postJSON(url = "", data = {}) {
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    const result = await response.json();
+    console.log("postJSON Success:", result);
+    return result;
+    
+  } catch (error) {
+    console.error("postJSON Error:", error);
+  }
+}
+

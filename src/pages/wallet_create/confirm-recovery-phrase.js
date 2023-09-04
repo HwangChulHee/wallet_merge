@@ -124,9 +124,6 @@ export default function Confirm_recovery_phrase(message) {
     const newWords = [...confirmWords];
     newWords[index] = value;
 
-    console.log("기존 니모닉 : ",confirmWords)
-    console.log("입력 한 단어와 인덱스: ",value, index)
-
     setConfirmWords(newWords);
   };
 

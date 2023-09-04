@@ -25,6 +25,19 @@ export default function Make_account() {
   const [privateKey, setPrivateKey] = useState('');
   const [tid, setTid] = useState('');
 
+  useEffect(() => {
+    // public key 요청.. 
+    chrome.storage.local.get(['keys'], (result) => {
+      const storedData = result.keys; 
+      setPublicKey(storedData[0].publicKey);
+      setPrivateKey(storedData[0].privateKey);
+      console.log("배열의 개수 : "+storedData.length)
+      console.log("public key의 값 : "+storedData[0].publicKey)
+      console.log("private key의 값 : "+storedData[0].privateKey)
+    });
+    
+  }, [])
+
   const handleAccountNameChange = (event) => {
     setAccountName(event.target.value);
   };
@@ -52,18 +65,6 @@ export default function Make_account() {
       console.error('Error fetching data:', error);
     }
   };
-
-  useEffect(() => {
-    // public key 요청.. 
-    chrome.storage.local.get(['keys'], (result) => {
-      const storedData = JSON.parse(result.keys); 
-      setPublicKey(storedData[0].publicKey);
-      setPrivateKey(storedData[0].privateKey);
-      console.log("public key의 값 : "+storedData[0].publicKey)
-      console.log("private key의 값 : "+storedData[0].privateKey)
-    });
-    
-  }, [])
 
 
     return (

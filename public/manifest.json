@@ -13,12 +13,6 @@
 },
 "content_scripts": [
   {
-      "js": ["scripts/content.js"],
-      "matches": [
-      "http://221.148.25.234/hch_test/*"
-      ]
-  }, 
-  {
     "js": ["scripts/content_login.js"],
       "matches": [
       "http://cryptoexplorer.store/*"
@@ -30,10 +24,5 @@
       "http://cryptoexplorer.store/Vote"
       ]
   }
-],
-"sandbox": {
-  "pages": [
-    "popup/popup.html"
-  ]
-} 
+]
 }

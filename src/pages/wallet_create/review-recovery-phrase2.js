@@ -55,6 +55,8 @@ export default function Review_recovery_phrase2() {
       console.error('Error fetching data:', error);
     }
   };
+  
+  console.log("이 부분은 postData랑 독립적으로 실행된다.");
 
 
   return (
