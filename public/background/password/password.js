@@ -13,9 +13,6 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
             console.log(message.password)
         })
 
-
-        return true; // 비동기 통신과 연관이 있다.
-
     }
  
 });

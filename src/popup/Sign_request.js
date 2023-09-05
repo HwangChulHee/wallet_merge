@@ -47,7 +47,7 @@ export default function Sign_request({choiceAccount}) {
                             신뢰할 수 있는 사이트만 연결하세요.
                         </div>
                         <div className="d-flex justify-content-between">
-                            <Button onClick={()=>{goBack()}} className="mx-2 btn_primary_outline card-content">취소</Button>
+                            <Button onClick={()=>{goBack()}} className="mx-2 btn_primary_outline card-content">이전</Button>
                             <Button onClick={handleRequestLogin} className="mx-2 btn_primary card-content">서명</Button>
                         </div>
                     </div>

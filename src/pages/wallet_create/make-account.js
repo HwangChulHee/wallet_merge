@@ -15,28 +15,63 @@ import Completion from '../completion';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
+async function postJSON(url = "", data = {}) {
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
 
+    const result = await response.json();
+    console.log("postJSON Success:", result);
+    return result;
+    
+  } catch (error) {
+    console.error("postJSON Error:", error);
+  }
+}
+
+async function account_store(new_account) {
+
+  // 1. 현재 chrome.storage에 저장된 키 값들의 배열을 가져오고
+  const result = await chrome.storage.local.get(["accounts"]);
+  console.log("현재 저장된 accounts 값들",result);
+
+  let updateData = [];
+  if(result.accounts) {
+      //accounts라는 key의 데이터가 존재하지 않거나 해당 값의 값들이 배열이 아닐때.. 즉, 초기값일 때를 의미함.
+      try {
+          const accountsArray = result.accounts;
+          if (Array.isArray(accountsArray)) {
+            updateData = accountsArray;
+            console.log("updateData에 과거 데이터 추가.")
+          }
+        } catch (error) {
+          console.error("Error parsing keys:", error);
+        }
+  }
+  console.log("updateData 확인 : ",updateData)
+
+  
+  // 2. 해당 배열에 새로 추가된 계정을 넣어준다
+  updateData.push(new_account); // 기존 데이터를 추가해준다.
+
+  
+  // 3. 해당 배열을 chrome.storage에 다시 넣어준다. (갱신한다)
+  await chrome.storage.local.set({accounts : updateData}); // 테스트를 위해 await 함
+  const result2 = await chrome.storage.local.get(["accounts"]);
+  console.log("갱신된 account 값들",result2);
+  
+}
 
 export default function Make_account() {
 
   const [accountName, setAccountName] = useState('');
   const [isValidAccount, setIsValidAccount] = useState(true);
-  const [publicKey, setPublicKey] = useState('');
-  const [privateKey, setPrivateKey] = useState('');
   const [tid, setTid] = useState('');
-
-  useEffect(() => {
-    // public key 요청.. 
-    chrome.storage.local.get(['keys'], (result) => {
-      const storedData = result.keys; 
-      setPublicKey(storedData[0].publicKey);
-      setPrivateKey(storedData[0].privateKey);
-      console.log("배열의 개수 : "+storedData.length)
-      console.log("public key의 값 : "+storedData[0].publicKey)
-      console.log("private key의 값 : "+storedData[0].privateKey)
-    });
-    
-  }, [])
 
   const handleAccountNameChange = (event) => {
     setAccountName(event.target.value);
@@ -48,19 +83,63 @@ export default function Make_account() {
   };
 
   const createAccount = async () => {
+    
     try {
-      const createName = accountName
-      const datas = {createName, publicKey}
-      const response = await axios.post('http://221.148.25.234:8989/createAccount', {datas});
-      console.log(response.data.result.transaction_id);
-      setTid(response.data.result.transaction_id)
+      const createName = accountName // 계정이름
+      
+      // 1. 저장된 니모닉과 계정 개수를 바탕으로 키를 생성한다.
+      
+      const result_user_mnemonic = await chrome.storage.local.get(["user_mnemonic"]); // 니모닉 가져오기
+      const result_accounts = await chrome.storage.local.get(["accounts"]); // 계정 가져오기
 
-      // 이후 로컬 스토리지에 계정 이름을 저장해준다.
-      chrome.runtime.sendMessage(
-        { action: "account_store", account_name: accountName, publicKey : publicKey, privateKey : privateKey}
-    );
+      console.log("createAccount : result_user_mnemonic : ");
+      console.log(result_user_mnemonic)
+      console.log("createAccount : result_accounts : ");
+      console.log(result_accounts)
+
+      let account_num = 0; // 계정의 수 가져오기
+      if(Object.keys(result_accounts).length !== 0) {
+        account_num = result_accounts.accounts.length;
+      }
+      console.log("createAccount : 계정의 수 : "+account_num);
+
       
+      // 2. 니모닉을 기반으로 키 생성을 요청한다.
+      const url_for_key = "http://221.148.25.234:3100/key_create_from_mnemonic";
+      const data_for_key = {
+          mnemonic: result_user_mnemonic.user_mnemonic,
+          num_child: account_num,
+        };
       
+      const keyData = await postJSON(url_for_key, data_for_key);
+
+      const publicKey = keyData.keyPairs[0].publicKey;
+      const privateKey = keyData.keyPairs[0].privateKey;
+
+
+
+      // 3. public과 private키를 기반으로 계정 생성을 요청하낟.
+      const url_for_account = "http://221.148.25.234:8989/createAccount";
+      const data_for_account = {
+          createName: createName,
+          publicKey: publicKey,
+        };
+
+      const response_account = await postJSON(url_for_account, {datas : data_for_account});
+      if(response_account.status == "SUCCESS") {
+          
+        console.log("계정생성 성공")
+        console.log("트랜잭션 아이디 : "+response_account.result.transaction_id);
+        setTid(response_account.result.transaction_id)
+        
+        const new_account = {account_name : accountName, publicKey :publicKey, privateKey : privateKey }
+        account_store(new_account); // 계정 생성에 성공하면 해당 계정을 storage에 저장한다.
+
+      } else {
+        console.log("계정생성 실패")
+      }
+
+    
     } catch (error) {
       console.error('Error fetching data:', error);
     }
@@ -78,17 +157,6 @@ export default function Make_account() {
               <Card.Text className='mb-5'>
               계정을 생성하세요.
               </Card.Text>
-
-              <div className="mb-5 mx-5 input-content">
-                <Form.Label htmlFor="password">publicKey (m/44'/1207'/0/0)</Form.Label>
-                <InputGroup className='my-input'>
-                  <Form.Control
-                    type='text'
-                    value={publicKey}
-                    readOnly
-                  />              
-                </InputGroup>
-              </div> 
 
               <div className="mb-3 mx-5 input-content">
                 <Form.Label htmlFor="password">계정명</Form.Label>
@@ -120,9 +188,7 @@ export default function Make_account() {
               <Button onClick={handleCreateAccount} className="mb-2 btn_primary card-content">계정 생성</Button>      
             </div>
           </div>
-           
-                  
-            
+                       
           </Card.Body>
         </Card>
       </div>

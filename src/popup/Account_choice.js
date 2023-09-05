@@ -41,18 +41,18 @@ function ShortenKey({ keyString }) {
         chrome.storage.local.get(['accounts'], (result) => {
             const storedData = result.accounts; 
             let updateData = [];
-            updateData.push(storedData);
-            setAccounts(updateData);
-
-            setChoiceAccount(storedData) // 선택한 계정. 추후 예외처리 해줘야함
+            updateData = storedData;
             
+            setAccounts(updateData);
             console.log(updateData);           
           });
 
 
     }, [])
 
-
+    const handleChoiceAccount = (account) => {
+        setChoiceAccount(account);
+    };
 
     const handleCloseLogin = () => {
         
@@ -60,7 +60,6 @@ function ShortenKey({ keyString }) {
             { action: "login_close"}
         );
     };
-
   
     return (
         <div className='card-container'>
@@ -74,14 +73,11 @@ function ShortenKey({ keyString }) {
                         {accounts.map((account, index) => (
                             <Card key={index} className="mb-2">
                                 <Card.Body className="d-flex align-items-center">
-                                    <Form.Check type="checkbox"/>
+                                    <Form.Check name='radio_account' type="radio" onChange={()=>handleChoiceAccount(account)} checked={choiceAccount === account}/>
                                     <div className='mx-4 d-flex flex-column' style={{ fontSize: '14px', textAlign: 'left' }}>
                                         <div>
                                             {account.account_name} <ShortenKey keyString={account.publicKey} />
                                         </div>
-                                        {/* <div>
-                                            {account.amount} HEP
-                                        </div> */}
                                     </div>
                                 </Card.Body>
                             </Card>
@@ -94,7 +90,7 @@ function ShortenKey({ keyString }) {
                         </div>
                         <div className="d-flex justify-content-between">
                             <Button onClick={handleCloseLogin} className="mx-2 btn_primary_outline card-content">취소</Button>
-                            <Button onClick={()=>{goTo(Sign_request, {choiceAccount})}} className="mx-2 btn_primary card-content">다음</Button>
+                            <Button onClick={()=>{goTo(Sign_request, {choiceAccount})}} disabled={!choiceAccount} className="mx-2 btn_primary card-content">다음</Button>
                         </div>
                     </div>
                     

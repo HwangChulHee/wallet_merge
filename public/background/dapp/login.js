@@ -3,17 +3,13 @@
 */
 
 let popupWindow = null;
-let login_sender = null;
 let tab_id = null;
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 
     
     if (message.action === "dapp_login") {
         // 디앱 로그인 요청 시
-
-        login_sender = sender;
         
-
         chrome.storage.local.set({request_state : "dapp_login"}).then(() => {
             
             console.log("request_state에 dapp_login 저장...")
@@ -37,7 +33,6 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 
 
         sendResponse("디앱 로그인을 위한 index.html 오픈.");
-        return true; // 비동기 통신과 연관이 있다.
     
     } else if(message.action === "login_request") {
 
@@ -50,9 +45,6 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
         process_login(accountName, publicKey);
 
         
-        
-        //return true; // 비동기 통신과 연관이 있다.
-
     } else if(message.action === "login_close") {
 
         console.log("로그인 팝업 창 닫기. ")
@@ -62,7 +54,9 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
             console.log("로그인 팝업 창 닫기 완료 ")            
         });
     }
- 
+
+
+    // return true; // 비동기 통신과 연관이 있다.
 });
 
 

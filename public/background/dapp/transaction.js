@@ -45,7 +45,7 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 
 
         sendResponse("디앱 트랜잭션 처리를 위한 index.html 오픈.");
-        return true; // 비동기 통신과 연관이 있다.
+
     
     } else if(message.action === "trx_request") {
 
@@ -54,9 +54,6 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
         // 선택된 계정의 이름과 public 키
         trx_process();
 
-        
-        
-        //return true; // 비동기 통신과 연관이 있다.
 
     } else if(message.action === "trx_close") {
 
@@ -71,61 +68,37 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 });
 
 // 버튼을 누르면 input태그에 있는 auth_name, data, action_account, action_name을 가져온다.
-function trx_process() {
+async function trx_process() {
 
-    chrome.storage.local.get(['keys'], (result) => {
-        const storedData = JSON.parse(result.keys); 
-        console.log(storedData);
-        
-        let senderPrivateKey = storedData[0].privateKey;
-        
-        console.log("api 요청하기전")
-        console.log(senderPrivateKey);
-        console.log(auth_name);
-        console.log(data);
-        console.log(action_account);
-        console.log(action_name); 
-        
-        const apiUrl = "http://221.148.25.234:8989/startTransaction"; // 니모닉으로부터 키 생성하는 api
-        const datas = {
-            senderPrivateKey,
-            action_account,
-            action_name,
-            auth_name,
-            data
-          };
+    // 계정들을 가져오고
+    const result_accounts = await chrome.storage.local.get(['accounts']);
+    const accounts = result_accounts.accounts;
 
-          console.log(JSON.stringify({
-            datas: datas
-          }))
+    console.log("계정 가져오기");
+    console.log(accounts);
 
-        // fetch 함수를 사용하여 API 요청 보내기
-        fetch(apiUrl, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-               datas: datas
-             })
-        })
-            .then(response => {
-                // 응답을 JSON으로 파싱
-                return response.json();
-            })
-            .then(data => {
-                // API 응답 데이터 처리
-                console.log("투표 트랙잭션 API 응답 데이터:", data);
-                trx_complete(data)
-                
-            })
-            .catch(error => {
-                // 에러 처리
-                console.error("투표 트랙잭션 API 요청 중 에러:", error);
-            });
-        
-      });
+    // 그 중에서 account_name에 매칭되는 privateKey를 추출한다.
+    const filteredData = accounts.filter(item => item.account_name === auth_name);
+
+    if (filteredData.length < 0) {
+        console.log('일치하는 데이터를 찾을 수 없습니다.');
+        return false;
+    }
+
+    const senderPrivateKey = filteredData[0].privateKey;
+    console.log("가지고 온 privateKey "+senderPrivateKey)
+
+    const url = "http://221.148.25.234:8989/startTransaction";
+    const datas = {
+        senderPrivateKey,
+        action_account,
+        action_name,
+        auth_name,
+        data
+    };
     
+    const response = await postJSON(url, {datas : datas});
+    trx_complete(response);    
 }
 
 function trx_complete (data) {
@@ -141,5 +114,24 @@ function trx_complete (data) {
         chrome.windows.remove(popupWindow, function() {
             console.log("트랜잭션 팝업 창 닫기 완료 ")            
         });
-      });
+      });      
 }
+
+async function postJSON(url = "", data = {}) {
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+  
+      const result = await response.json();
+      console.log("postJSON Success:", result);
+      return result;
+      
+    } catch (error) {
+      console.error("postJSON Error:", error);
+    }
+  }

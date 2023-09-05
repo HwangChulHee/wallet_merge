@@ -50,6 +50,8 @@ if(btn_transaction != null) {
     }
   );
   
+} else {
+  console.log("트랜잭션 버튼 없음")
 }
 
 
