@@ -69,60 +69,6 @@ function CircleText2(props) {
   );
 }
 
-async function key_store(data) {
-
-  // 1. 현재 chrome.storage에 저장된 키 값들의 배열을 가져오고
-  const result = await chrome.storage.local.get(["keys"]);
-  console.log("key_store : 현재 저장된 key 값들",result);
-
-  let updateData = [];
-  if(result.keys) {
-      //keys라는 key의 데이터가 존재할때. 이미 키들이 존재할 때를 의미.
-      try {
-          const keysArray = result.keys;
-          if (Array.isArray(keysArray)) {
-            updateData = keysArray;
-            console.log("key_store : updateData에 과거 데이터 추가.")
-          }
-        } catch (error) {
-          console.error("key_store : Error parsing keys:", error);
-        }
-  }
-  console.log("key_store : updateData 확인 : ",updateData)
-
-  
-  // 2. 해당 배열에 새로 추가된 키를 넣어준다 (키 값들을 갱신한다.)
-  const keyPairs = data.keyPairs[0]; // 매개변수 데이터로부터 key값이 keyParirs의 첫번째 원소들을 가져오고
-  updateData.push(keyPairs); // 기존 데이터를 추가해준다.
-
-  
-  // 3. 해당 배열을 chrome.storage에 다시 넣어준다. (갱신한다)
-  await chrome.storage.local.set({keys : updateData}); // 테스트를 위해 await 함
-  const result2 = await chrome.storage.local.get(["keys"]);
-  console.log("key_store : 갱신된 key 값들",result2);
-  
-}
-
-
-async function postJSON(url = "", data = {}) {
-  try {
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
-
-    const result = await response.json();
-    console.log("postJSON Success:", result);
-    return result;
-    
-  } catch (error) {
-    console.error("postJSON Error:", error);
-  }
-}
-
 
 export default function Confirm_recovery_phrase(message) {
 

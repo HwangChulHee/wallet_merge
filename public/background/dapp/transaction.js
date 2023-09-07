@@ -85,6 +85,7 @@ async function trx_process() {
         return false;
     }
 
+    console.log(filteredData);
     const senderPrivateKey = filteredData[0].privateKey;
     console.log("가지고 온 privateKey "+senderPrivateKey)
 
@@ -111,6 +112,7 @@ function trx_complete (data) {
         // 여기에서 response를 사용하여 원하는 작업을 수행
         console.log("콘텐츠 스크립트로 데이터 전송..", response)
 
+        chrome.storage.local.set({request_state : "main"});
         chrome.windows.remove(popupWindow, function() {
             console.log("트랜잭션 팝업 창 닫기 완료 ")            
         });

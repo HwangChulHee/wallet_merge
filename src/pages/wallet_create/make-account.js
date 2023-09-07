@@ -64,6 +64,8 @@ async function account_store(new_account) {
   await chrome.storage.local.set({accounts : updateData}); // 테스트를 위해 await 함
   const result2 = await chrome.storage.local.get(["accounts"]);
   console.log("갱신된 account 값들",result2);
+
+  chrome.storage.local.set({request_state : "main"});
   
 }
 
@@ -85,7 +87,6 @@ export default function Make_account() {
   const createAccount = async () => {
     
     try {
-      const createName = accountName // 계정이름
       
       // 1. 저장된 니모닉과 계정 개수를 바탕으로 키를 생성한다.
       
@@ -104,7 +105,7 @@ export default function Make_account() {
       console.log("createAccount : 계정의 수 : "+account_num);
 
       
-      // 2. 니모닉을 기반으로 키 생성을 요청한다.
+      // 2. 니모닉을 기반으로 키 생성을 요청한다. (니모닉 기반 키 요청)
       const url_for_key = "http://221.148.25.234:3100/key_create_from_mnemonic";
       const data_for_key = {
           mnemonic: result_user_mnemonic.user_mnemonic,
@@ -117,8 +118,26 @@ export default function Make_account() {
       const privateKey = keyData.keyPairs[0].privateKey;
 
 
+      // 2.5 해당 public 키로 설정된 계정이 있는지 조회한다. (공개키의 계정 여부 조회)
+      const url_for_publicKeyAccount = "http://221.148.25.234:8989/getAccountList";
+      const data_for_publicKeyAccount = {
+          publicKey: publicKey
+        };
+      
+      const result_publicKeyAccount = await postJSON(url_for_publicKeyAccount, {datas : data_for_publicKeyAccount});
+      const publicKeyAccount = result_publicKeyAccount.accounts;
+      console.log("createAccount : 계정조회 결과")
+      console.log(publicKeyAccount)
+      if(Array.isArray(publicKeyAccount) && publicKeyAccount.length !== 0) {
+        console.log("이미 계정이 존재하는 public key입니다.")
+        return;
+      }    
 
-      // 3. public과 private키를 기반으로 계정 생성을 요청하낟.
+
+      // 3. 해당 public key로 설정된 계정이 없다면 public과 private키를 기반으로 계정 생성을 요청한다..
+      
+      const createName = accountName // 계정이름
+
       const url_for_account = "http://221.148.25.234:8989/createAccount";
       const data_for_account = {
           createName: createName,

@@ -61,6 +61,8 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 
 
 function process_login(accountName, publicKey) {
+    chrome.storage.local.set({request_state : "main"});
+
     chrome.tabs.sendMessage(tab_id, { 
         action: "login_complete_from_extension", 
         account_name: accountName,

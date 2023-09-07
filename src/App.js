@@ -14,38 +14,11 @@ import { BrowserRouter, Route,Routes} from 'react-router-dom';
 import Welcome from './pages/welcome';
 import Header from './pages/header';
 import Test from './pages/test'
+import Main from './Main'
 
 import PopupComponent from './popup/PopupComponent'
 import Sign_request_transaction from './popup/Sign_request_transaction';
 
-
-const Three = ({message}) => (
-  <div onClick={() => popToTop()}>
-    <h1>{message}</h1>
-    <p>Click me to pop to the top</p>
-  </div>
-);
-
-const Two = ({message}) => (
-  <div>
-    This is component Two. I was passed a message:
-    <p>{message}</p>
-    <button onClick={() => goBack()}>
-      Click me to go back to component One
-    </button>
-    <button onClick={() => goTo(Three, { message })}>
-      Click me to go to component Three!
-    </button>
-  </div>
-);
-
-const One = () => {
-  return (
-    <Link component={Two} props={{ message: 'I came from component one!' }}>
-      This is component One. Click me to route to component Two
-    </Link>
-  );
-};
 
 
 function App() {
@@ -77,7 +50,16 @@ function App() {
         let updateData = [];
         updateData.push(<Sign_request_transaction/>);
         setComponentsToRender(updateData);
+
+      } else if(storedData == "main") {
+        let updateData = [];
+        updateData.push(<BrowserRouter><Main/></BrowserRouter>);
+        setComponentsToRender(updateData);
       }
+
+      // let updateData = [];
+      // updateData.push(<BrowserRouter><Main/></BrowserRouter>);
+      // setComponentsToRender(updateData);
       
     });
 
@@ -90,11 +72,6 @@ function App() {
       {
         componentsToRender
       }      
-
-      {/* <Header/>
-      <Router>
-        <Welcome/>
-      </Router> */}
     </>
   );
 }
